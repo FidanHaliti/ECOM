@@ -27,3 +27,11 @@
 .btn-primary{
   border-color: black;
 }
+
+@media (max-width: 600px) {
+  .shopping-cart-list{
+    width: 20rem;
+
+  }
+  }
+
