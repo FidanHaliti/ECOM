@@ -1,55 +1,86 @@
-const main = document.querySelector(".products");
-let products = [];
+const card = document.getElementsByClassName("card");
+const btnAdd = document.getElementsByClassName("btn-black");
+const btnCart = document.querySelector(".btn-cart");
+const cartList = document.querySelector(".shopping-cart-list");
 
-const trimText = (value, number) => {
-  return value.substring(0, number) + "...";
-};
+class Shopping {
+  constructor(title, price, image) {
+    this.image = image;
+    this.title = title;
+    this.price = price;
+  }
+}
 
-const listitems = (images, title, category, price) => {
-  let Product = document.createElement("div");
-  let Image = document.createElement("img");
-  let Title = document.createElement("h2");
-  let Category = document.createElement("h4");
-  let Price = document.createElement("h3");
-  let button = document.createElement("div");
+class UI {
+  addToCart(shopping) {
+    const listItem = document.createElement("div");
+    listItem.classList = "list-item";
 
+    listItem.innerHTML = `
+        <div class="row align-items-center text-white-50">
+            <div class="col-md-3">
+                <img src="${shopping.image}" alt="product" class="img-fluid">
+            </div>
+            <div class="col-md-5">
+                <div class="title">${shopping.title}</div>
+            </div>
+            <div class="col-md-2">
+                <div class="price">${shopping.price}</div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-delete">
+                    <i class="fas fa-trash-alt text-danger"></i>
+                </button>
+            </div>
+        </div>
+        `;
+    cartList.appendChild(listItem);
+  }
 
-  for (let i = 0; i < button.classList.length; i++) { 
-    button[i].addEventListener("click", function(e) {
-      e.preventDefault();
-      
-    })
-  } 
+  removeCart() {
+    let btnRemove = document.getElementsByClassName("btn-delete");
+    let self = this;
+    for (let i = 0; i < btnRemove.length; i++) {
+      btnRemove[i].addEventListener("click", function () {
+        this.parentElement.parentElement.parentElement.remove();
+        self.cartCount();
+      });
+    }
+  }
 
+  cartCount() {
+    let cartListItem = cartList.getElementsByClassName("list-item");
+    let itemCount = document.getElementById("item-count");
+    itemCount.innerHTML = cartListItem.length;
+  }
 
-  Product.classList.add("product");
-  button.classList.add("hudhe");
+  cartToggle() {
+    btnCart.addEventListener("click", function () {
+      cartList.classList.toggle("d-none");
+    });
+  }
+}
 
-  
-  Image.src = images;
-  Title.textContent = title;
-  Category.textContent = category;
-  Price.textContent = price + " €.";
-  button.textContent = "Shto ne shporte";
-  button.innerHTML += `${"<i class='fas fa-cart-arrow-down'></i>"}`;
-  Product.appendChild(Image);
-  Product.appendChild(Title);
-  Product.appendChild(Category);
-  Product.appendChild(Price);
-  Product.appendChild(button);
-  main.appendChild(Product);
-};
+for (let i = 0; i < card.length; i++) {
+  btnAdd[i].addEventListener("click", function (e) {
+    let title = card[i].getElementsByClassName("card-title")[0].textContent;
+    let price = card[i].getElementsByClassName("price")[0].textContent;
+    let image = card[i].getElementsByClassName("card-img-top")[0].src;
+    btnAdd[i].classList.add("disabled");
+    btnAdd[i].textContent = "In Card";
+    let shopping = new Shopping(title, price, image);
+    let ui = new UI();
 
-const getproducts = async () => {
-  let data = await fetch("https://api.escuelajs.co/api/v1/products");
-  let result = await data.json();
-  products = result;
-  products.map((item) => {
-    listitems(item.images, trimText(item.title, 25), item.category.name, item.price);
-    
+    ui.addToCart(shopping);
+    ui.removeCart();
+    ui.cartCount();
+
+    e.preventDefault();
   });
-  
-  
-};
+}
 
-getproducts();
+document.addEventListener("DOMContentLoaded", () => {
+  let ui = new UI();
+
+  ui.cartToggle();
+});
